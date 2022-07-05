@@ -2,12 +2,9 @@ package main
 
 import "github.com/sirupsen/logrus"
 
-var logger *logrus.Logger
+var Logger *logrus.Logger
 
-func GetLogger() *logrus.Logger {
-	if logger == nil {
-		logger = logrus.New()
-		logger.SetFormatter(&logrus.JSONFormatter{})
-	}
-	return logger
+func init() {
+	Logger = logrus.New()
+	Logger.SetFormatter(&logrus.JSONFormatter{})
 }
