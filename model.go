@@ -6,10 +6,8 @@ type Client struct {
 	Alias string `json:"alias"`
 }
 
-type ForwardRequest struct {
-	Path   string `json:"path"`
-	Method string `json:"method"`
-	Header any    `json:"header"`
-	Body   any    `json:"body"`
-	Port   string `json:"port"`
+type ClientResponse struct {
+	Status  int            `json:"status"`
+	Headers map[string]any `json:"headers"`
+	Body    any            `json:"body"`
 }

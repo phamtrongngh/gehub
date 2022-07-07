@@ -1,13 +1,11 @@
 package main
 
-type appStore struct {
+type store struct {
 	ClientByAlias map[string]*Client
 }
 
-var Store *appStore
-
-func init() {
-	Store = &appStore{
+func NewStore() *store {
+	return &store{
 		ClientByAlias: make(map[string]*Client),
 	}
 }
