@@ -1,36 +1,19 @@
 let socket;
 
-const connectForm = document.querySelector("#connect-form");
-const connectBtn = connectForm.querySelector("#connect-btn");
-const connectResult = document.querySelector("#connect-result");
-const disconnectBtn = connectResult.querySelector("#disconnect-btn");
-const loading = document.querySelector("#loading");
-
-document.querySelectorAll(".copyable").forEach((c) => {
-  c.addEventListener("click", (e) => {
-    navigator.clipboard.writeText(e.target.textContent);
-  });
-});
-
-function hideElement(element) {
-  element.style.display = "none";
-}
-
-function showElement(element) {
-  element.style.display = "block";
-}
-
 function connect() {
   const alias = String(document.getElementById("alias-txt").value);
   const port = Number(document.getElementById("port-txt").value);
 
   if (!port || port < 1024 || port > 65535) {
-    console.log("port invalid");
+    showNotiBox("Port must be in range 1024-65535", "error");
     return;
   }
 
   if (!/^[\w-]{0,30}$/.test(alias)) {
-    console.log("alias invalid");
+    showNotiBox(
+      "Alias must be words, numbers, hyphens or underscores (less than 30 characters)",
+      "error"
+    );
     return;
   }
 
@@ -60,25 +43,65 @@ function connect() {
     connectResult.querySelector(
       "#local-url"
     ).textContent = `http://localhost:${data.port}`;
-    
+
     showElement(connectResult);
-
   });
 
-  socket.on("forward", (data) => {
-    console.log("forward", data);
+  socket.on("forward", async (data) => {
+    const { path, method, port, body, headers } = data;
+    let response, resStatus, resHeaders, resBody;
+
+    try {
+      response = await fetch(`http://localhost:${port}/${path}`, {
+        headers,
+        method,
+        body,
+      });
+      resStatus = response.status;
+
+      resHeaders = {};
+      response.headers.forEach(function (value, key) {
+        resHeaders[key] = value;
+      });
+
+      const contentType = resHeaders["content-type"];
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        resBody = await response.json();
+      } else {
+        resBody = await response.text();
+      }
+    } catch (e) {
+      showNotiBox(`
+        Cannot forward request to local server. 
+        Ensure that the server has been enabled CORS and accepts all HTTP request methods.
+      `, "error");
+      resHeaders = {};
+      resStatus = 502;
+      resBody = {};
+    }
+
+    insertLog(resStatus, method, path);
+
+    socket.emit("forward", {
+      status: resStatus,
+      headers: resHeaders,
+      body: resBody,
+    });
   });
 
-  socket.on("disconnect", (data) => {
-    console.log("disconnect", data);
-  });
+  socket.on("disconnect", disconnect);
 }
 
-function disconnect() {
+function disconnect(msg) {
   hideElement(connectResult);
   showElement(loading);
+  showNotiBox("Connection closed: " + msg, "error")
 
-  socket.disconnect();
+  if (socket.connected) {
+    socket.disconnect();
+  }
+
+  clearLogs();
 
   hideElement(loading);
   showElement(connectForm);

@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <title>GEHUB</title>
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link
+      rel="stylesheet"
+      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+    />
     <link href="./assets/css/style.css" rel="stylesheet" />
   </head>
   <body>
@@ -15,64 +18,47 @@
         <div class="content" id="connect-form">
           <h1 class="text-bg" style="font-family: cursive">Gehub</h1>
           <div class="content-row">
-            <input id="port-txt" type="text" placeholder="Port"/> 
+            <input id="port-txt" type="text" value="3000" placeholder="Port" />
           </div>
           <div class="content-row">
-            <input id="alias-txt" type="text" placeholder="Alias (optional)"/> 
+            <input
+              id="alias-txt"
+              type="text"
+              value="nghiapt"
+              placeholder="Alias (optional)"
+            />
           </div>
           <button id="connect-btn"><i class="icon ion-log-in"></i></button>
         </div>
-        
+
         <div class="content" id="connect-result">
           <div class="text-bg">
-            <span class="badge copyable" id="forward-url">http://gehub.icankid.com/benalpha</span> ->  
-            <span class="badge copyable" id="local-url">http://localhost:3000</span>
+            <span class="badge copyable" id="forward-url"
+              >http://gehub.icankid.com/benalpha</span
+            >
+            ->
+            <span class="badge copyable" id="local-url"
+              >http://localhost:3000</span
+            >
           </div>
           <div class="content-row">
-          <table class="request-table">
-            <!-- <tr>
-              <td>09:12:12 01/12/2022</td>
-              <td>200</td>
-              <td>GET</td>
-              <td>/business/merchants</td>
-            </tr> -->
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
+            <table id="request-table">
+              <tbody></tbody>
+            </table>
+          </div>
           <button id="disconnect-btn"><i class="icon ion-power"></i></button>
         </div>
 
         <div class="content" id="loading">
-          <h1><img src="./assets/media/loading.gif" ></h1>
+          <h1><img src="./assets/media/loading.gif" /></h1>
         </div>
-
       </div>
+
+      <div id="noti-box"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js"></script>
-    <script src="./assets/js/script.js"></script>    
+    <script src="./assets/js/ui.js"></script>
+    <script src="./assets/js/script.js"></script>
   </body>
 </html>
