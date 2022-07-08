@@ -1,70 +1,79 @@
 package main
 
 import (
-	"errors"
-
 	socketio "github.com/googollee/go-socket.io"
 )
-
-func disconnect(c socketio.Conn, err error) {
-	client := c.Context().(*Client)
-	delete(Store.ClientByAlias, client.Alias)
-	c.Emit("disconnect", err.Error())
-}
 
 func StartWsServer() *socketio.Server {
 	server := socketio.NewServer(nil)
 
 	server.OnConnect("/", func(c socketio.Conn) error {
+		Logger.Infof("Client %s has connected to WebSocket server.", c.ID())
+		return nil
+	})
+
+	server.OnEvent("/", "expose", func(c socketio.Conn, client *Client) {
 		if server.Count() > ConnectionLimit {
-			err := errors.New("concurrent connections limit exceeded")
-			disconnect(c, err)
-			return err
+			c.Emit("expose", map[string]string{
+				"error": "Server is overloaded, please come back later",
+			})
+			return
 		}
 
-		url := c.URL()
-
-		client := &Client{
-			ID:    c.ID(),
-			Port:  url.Query().Get("port"),
-			Alias: url.Query().Get("alias"),
-		}
+		client.ID = c.ID()
+		client.FwdChan = make(chan *ClientResponse, 10)
 
 		if client.Alias == "" {
 			client.Alias = RandomString(AliasLength)
 		}
 		if _, exist := Store.ClientByAlias[client.Alias]; exist {
-			err := errors.New("alias already exists")
-			disconnect(c, err)
-			return err
+			c.Emit("expose", map[string]string{
+				"error": "Alias already exists, please choose a different one",
+			})
+			return
 		}
 
 		c.SetContext(client)
 		Store.ClientByAlias[client.Alias] = client
 
 		Logger.Infof(
-			"Client '%s' has connected and exposed port '%s' with alias '%s'.",
+			"Client %s has exposed port %d with alias %s.",
 			c.ID(),
 			client.Port,
 			client.Alias,
 		)
 
-		return nil
+		c.Emit("expose", client)
 	})
 
-	server.OnEvent("/", "info", func(c socketio.Conn) {
-		client := c.Context().(*Client)
-		c.Emit("info", client)
+	server.OnEvent("/", "unexpose", func(c socketio.Conn) {
+		client, ok := c.Context().(*Client)
+		if ok {
+			delete(Store.ClientByAlias, client.Alias)
+		}
+
+		Logger.Infof(
+			"Client %s has unexposed port %d with alias %s.",
+			c.ID(),
+			client.Port,
+			client.Alias,
+		)
+
+		c.Emit("unexpose")
 	})
 
 	server.OnEvent("/", "forward", func(c socketio.Conn, res *ClientResponse) {
-		Logger.Infof("Received response from client '%s' with status %d", c.ID(), res.Status)
-
+		Logger.Infof("Received response from client %s with status %d", c.ID(), res.Status)
+		client := c.Context().(*Client)
+		client.FwdChan <- res
 	})
 
-	server.OnDisconnect("/", func(c socketio.Conn, s string) {
-		disconnect(c, nil)
-		Logger.Infof("Client '%s' has disconnected.", c.ID())
+	server.OnDisconnect("/", func(c socketio.Conn, msg string) {
+		client, ok := c.Context().(*Client)
+		if ok {
+			delete(Store.ClientByAlias, client.Alias)
+		}
+		Logger.Infof("Client %s has disconnected: %s", c.ID(), msg)
 	})
 
 	go server.Serve()

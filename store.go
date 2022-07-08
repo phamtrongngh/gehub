@@ -9,3 +9,5 @@ func NewStore() *store {
 		ClientByAlias: make(map[string]*Client),
 	}
 }
+
+var Store = NewStore()

@@ -1,9 +1,11 @@
-const connectForm = document.querySelector("#connect-form");
-const connectBtn = connectForm.querySelector("#connect-btn");
+const exposeForm = document.querySelector("#connect-form");
+const exposeBtn = exposeForm.querySelector("#connect-btn");
 
-const connectResult = document.querySelector("#connect-result");
-const disconnectBtn = connectResult.querySelector("#disconnect-btn");
-const requestTable = connectResult.querySelector("#request-table");
+const exposeResult = document.querySelector("#connect-result");
+const unexposeBtn = exposeResult.querySelector("#disconnect-btn");
+const requestTable = exposeResult.querySelector("#request-table");
+const forwardUrl = exposeResult.querySelector("#forward-url");
+const localUrl = exposeResult.querySelector("#local-url");
 
 const loading = document.querySelector("#loading");
 
@@ -106,7 +108,7 @@ function clearLogs() {
   requestTable.tBodies[0].innerHTML = "";
 }
 
-function showNotiBox(msg, theme) {
+function showNotiBox(msg, theme = "success") {
   notiBox.textContent = msg;
   notiBox.className = theme + " show";
 
