@@ -12,12 +12,38 @@ socket.on("forward", async (data) => {
     });
     resStatus = response.status;
 
+    insertLog(resStatus, method, path);
+
     resHeaders = {};
     response.headers.forEach(function (value, key) {
       resHeaders[key] = value.replace(/ /g, "").split(",");
     });
 
-    // resBody = await response.text();
+    // if content-type is image, then encode it to base64 and insert into resBody
+    if (resHeaders["content-type"].find((item) => item.includes("image"))) {
+      const imageBlob = await response.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(imageBlob);
+      reader.onloadend = () => {
+        const base64data = reader.result;
+        resBody = base64data;
+        resHeaders["content-length"] = [`${base64data.length}`];
+
+        socket.emit("forward", {
+          status: resStatus,
+          headers: resHeaders,
+          body: resBody,
+        });
+      };
+    } else {
+      resBody = await response.text();
+
+      socket.emit("forward", {
+        status: resStatus,
+        headers: resHeaders,
+        body: resBody,
+      });
+    }
   } catch (e) {
     showNotiBox(
       `
@@ -28,30 +54,13 @@ socket.on("forward", async (data) => {
     resHeaders = {};
     resStatus = 502;
     resBody = "";
+
+    socket.emit("forward", {
+      status: resStatus,
+      headers: resHeaders,
+      body: resBody,
+    });
   }
-
-  insertLog(resStatus, method, path);
-
-  // if content-type is image, then encode it to base64 and insert into resBody
-  if (resHeaders["content-type"].find((item) => item.includes("image"))) {
-    const imageBlob = await response.blob();
-    const reader = new FileReader();
-    reader.readAsDataURL(imageBlob);
-    reader.onloadend = () => {
-      const base64data = reader.result;
-      // resBody = `data:${resHeaders["content-type"]};base64,${resBody}`;
-      resBody = base64data;
-      console.log("onloaded truoc...")
-    }
-  }
-
-  console.log("emit truoc...")
-
-  socket.emit("forward", {
-    status: resStatus,
-    headers: resHeaders,
-    body: resBody,
-  });
 });
 
 // Expose port

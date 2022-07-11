@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -83,8 +82,6 @@ func main() {
 		pkg.Logger.Infof("Received response from client %s with status %d", c.ID(), res.Status)
 		client := c.Context().(*pkg.Client)
 
-		// check if res.Body can be a image
-		fmt.Println("is base 64: ", pkg.IsBase64(res.Body))
 		client.FwdChan <- res
 	})
 

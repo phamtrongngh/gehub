@@ -26,15 +26,6 @@ func main() {
 		req.URL.Path = "/proxy" + req.URL.Path
 	}
 
-	reverseProxy.ModifyResponse = func(resp *http.Response) error {
-		// check if response is a image
-		if strings.HasPrefix(resp.Header.Get("Content-Type"), "image") {
-			resp.Header.Set("Cache-Control", "public, max-age=31536000")
-		}
-
-		return nil
-	}
-
 	server.Any("/*any", gin.WrapH(reverseProxy))
 
 	if err := server.Run(

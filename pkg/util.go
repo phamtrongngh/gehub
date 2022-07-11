@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"math/rand"
 )
@@ -19,10 +18,4 @@ func RandomString(n int) string {
 func BytesToMap(bytes []byte) (body map[string]any) {
 	json.Unmarshal(bytes, &body)
 	return
-}
-
-// function to check if a string is base64
-func IsBase64(s string) bool {
-	_, err := base64.StdEncoding.DecodeString(s)
-	return err == nil
 }
