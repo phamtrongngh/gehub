@@ -1,7 +1,7 @@
 ![cover image](./doc/logo.png)
 ![banner](./doc/banner.png)
 
-[Gehub](https://github.com/phamtrongngh/gehub) is a tool that helps expose the HTTP server running on your local machine. Its feature is the same as Ngrok or Localtunnel but easier to use (no need to install, access [Web UI](http://gehub.benalpha.online), and use).
+[Gehub](http://gehub.benalpha.online) is a tool that helps expose the HTTP server running on your local machine. Its feature is the same as Ngrok or Localtunnel but easier to use (no need to install, access [Web UI](http://gehub.benalpha.online), and use).
 
 # 🛰 Usage
 Try a demo version hosted at [Gehub](http://gehub.benalpha.online).
