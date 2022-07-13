@@ -1,11 +1,28 @@
 const socket = io("", { transports: ["websocket"] });
 
+function getLocalHostname(){
+  let userAgent = navigator.userAgent;  
+  if(userAgent.match(/chrome|chromium|crios/i)){
+      return "0.0.0.0"
+    }else if(userAgent.match(/firefox|fxios/i)){
+      return "0.0.0.0"
+    }  else if(userAgent.match(/safari/i)){
+      return "127.0.0.1"
+    } else if(userAgent.match(/opr\//i)){
+      return "0.0.0.0";
+    } else if(userAgent.match(/edg/i)){
+      return "0.0.0.0"
+    }else{
+      return "0.0.0.0"
+    }
+}
+
 socket.on("forward", async (data) => {
   const { path, method, port, body, headers } = data;
   let response, resStatus, resHeaders, resBody;
 
   try {
-    response = await fetch(`http://0.0.0.0:${port}/${path}`, {
+    response = await fetch(`http://${getLocalHostname()}:${port}/${path}`, {
       headers,
       method,
       body,
@@ -19,31 +36,7 @@ socket.on("forward", async (data) => {
       resHeaders[key] = value.replace(/ /g, "").split(",");
     });
 
-    // if content-type is image, then encode it to base64 and insert into resBody
-    if (resHeaders["content-type"].find((item) => item.includes("image"))) {
-      const imageBlob = await response.blob();
-      const reader = new FileReader();
-      reader.readAsDataURL(imageBlob);
-      reader.onloadend = () => {
-        const base64data = reader.result;
-        resBody = base64data;
-        resHeaders["content-length"] = [`${base64data.length}`];
-
-        socket.emit("forward", {
-          status: resStatus,
-          headers: resHeaders,
-          body: resBody,
-        });
-      };
-    } else {
-      resBody = await response.text();
-
-      socket.emit("forward", {
-        status: resStatus,
-        headers: resHeaders,
-        body: resBody,
-      });
-    }
+    resBody = await response.text();
   } catch (e) {
     showNotiBox(
       `
@@ -54,13 +47,13 @@ socket.on("forward", async (data) => {
     resHeaders = {};
     resStatus = 502;
     resBody = "";
-
-    socket.emit("forward", {
-      status: resStatus,
-      headers: resHeaders,
-      body: resBody,
-    });
   }
+
+  socket.emit("forward", {
+    status: resStatus,
+    headers: resHeaders,
+    body: resBody,
+  });
 });
 
 // Expose port
