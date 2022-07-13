@@ -41,7 +41,7 @@ socket.on("forward", async (data) => {
     showNotiBox(
       `
       Cannot forward request to local server. Ensure that the server 
-      has been enabled CORS and accepts all HTTP request methods.`,
+      has been enabled CORS (Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods).`,
       "error"
     );
     resHeaders = {};
@@ -92,7 +92,10 @@ socket.on("expose", (data) => {
   forwardUrl.textContent = data.proxyPublicUrl;
   localUrl.textContent = `http://localhost:${data.port}`;
   showElement(exposeResult);
-  showNotiBox("Expose successfully", "success");
+  showNotiBox(`Expose your local server successfully. Make sure that the local server has been 
+    enabled CORS (Access-Control-Allow-Origin, Access-Control-Allow-Headers, 
+    Access-Control-Allow-Methods)`, "success"
+  );
 });
 
 // Unexpose port
