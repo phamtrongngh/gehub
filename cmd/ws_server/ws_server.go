@@ -105,6 +105,9 @@ func main() {
 	r.POST("/socket.io/*any", gin.WrapH(wsServer))
 
 	r.Any("/proxy/*any", func(ctx *gin.Context) {
+		pkg.Logger.Infof(
+			"Received request from proxy server with host: %s", ctx.Request.Host,
+		)
 		alias := strings.Split(ctx.Request.Host, ".")[0]
 
 		client, ok := pkg.Store.ClientByAlias[alias]
