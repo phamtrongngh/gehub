@@ -9,9 +9,9 @@ type ClientResponse struct {
 }
 
 type Client struct {
-	ID       string               `json:"-"`
-	ProxyUrl string               `json:"proxyUrl"`
-	Port     uint                 `json:"port"`
-	Alias    string               `json:"alias"`
-	FwdChan  chan *ClientResponse `json:"-"`
+	ID             string               `json:"-"`
+	ProxyPublicUrl string               `json:"proxyPublicUrl"`
+	Port           uint                 `json:"port"`
+	Alias          string               `json:"alias"`
+	FwdChan        chan *ClientResponse `json:"-"`
 }

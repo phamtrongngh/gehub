@@ -96,7 +96,7 @@ socket.on("expose", (data) => {
     return;
   }
 
-  forwardUrl.textContent = data.proxyUrl;
+  forwardUrl.textContent = data.proxyPublicUrl;
   localUrl.textContent = `http://localhost:${data.port}`;
   showElement(exposeResult);
   showNotiBox("Expose successfully", "success");

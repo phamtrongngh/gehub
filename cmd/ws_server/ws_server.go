@@ -40,14 +40,14 @@ func main() {
 			return
 		}
 
-		proxyUrl, err := url.Parse(pkg.ProxyUrl)
+		proxyPublicUrl, err := url.Parse(pkg.ProxyPublicUrl)
 		if err != nil {
 			c.Emit("expose", map[string]string{
 				"error": "Something went wrong, please try again later",
 			})
 			return
 		}
-		client.ProxyUrl = proxyUrl.Scheme + "://" + client.Alias + "." + proxyUrl.Host + proxyUrl.Path
+		client.ProxyPublicUrl = proxyPublicUrl.Scheme + "://" + client.Alias + "." + proxyPublicUrl.Host + proxyPublicUrl.Path
 
 		c.SetContext(client)
 		pkg.Store.ClientByAlias[client.Alias] = client
