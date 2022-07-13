@@ -5,7 +5,7 @@ socket.on("forward", async (data) => {
   let response, resStatus, resHeaders, resBody;
 
   try {
-    response = await fetch(`http://localhost:${port}/${path}`, {
+    response = await fetch(`http://0.0.0.0:${port}/${path}`, {
       headers,
       method,
       body,
